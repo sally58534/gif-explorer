@@ -1,0 +1,26 @@
+services:
+  backend:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://backend:3000/health-check"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_BASE_BE_URL=http://localhost:3000
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
